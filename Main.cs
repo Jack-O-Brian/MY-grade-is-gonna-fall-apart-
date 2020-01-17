@@ -18,10 +18,18 @@ namespace Jan9th
 			}
 		}
 
+		// The code for calcuatoing the Hrange gets complex/hard to read, so I'm making my own function for it, so when I need to change it, I change it here.
+		public static double TaxNum(int H, int L, double B ){
+			double sum=Math.Round(B* (H-L));
+			Console.WriteLine("At "+B+"% bracket, the amount due is  "+sum);
+			return (sum);
+		}
 		// Given amount of taxable income, return the tax of it, from the highest bracket for a single person
-		public static void FederalTax(int TaxableIncome){
+		public static void FederalTax(int TaxableIncome, int Det=12200){
+			int temp=TaxableIncome;
+			TaxableIncome-=Det;
 
-			Console.WriteLine(TaxableIncome);
+			//Console.Write(TaxableIncome+":\t");
 			TaxBrack[] Taxis={
 				new TaxBrack(.10,0,9700),		//0
 				new TaxBrack(.12,9700,39475),		//1
@@ -31,36 +39,53 @@ namespace Jan9th
 				new TaxBrack(.35,204100,510300),	//5
 				new TaxBrack(.37, 510300,-1) 		//6
 			};
+
 			int Range=0;
-			for(int i=0; i<Taxis.Length; i++){
-				if(Taxis[i].LRange<TaxableIncome)
+			for(int i=1; i<Taxis.Length; i++){
+				if(Taxis[i].LRange<TaxableIncome){
 					Range++;
+				}
 			}
 			Console.WriteLine(Range +"\t" + Taxis[Range].Bracket);
 
-			double Sum=0;
-			for(int i=0; i<Range-1; i++){
-				Console.WriteLine(i + ":\t" + Taxis[i].Bracket*(
-				Taxis[i].HRange - Taxis[i].LRange ) + "\t" + Taxis[i].LRange + "\t" + Taxis[i].HRange +"\t" + Taxis[i].Bracket);
-				Sum+=(Taxis[i].Bracket*(Taxis[i].HRange - Taxis[i].LRange ));
+			double sum=0;
+			for(int i=0; i<Range; i++){
+				sum+=TaxNum(Taxis[i].HRange, Taxis[i].LRange, Taxis[i].Bracket);
+			}
+			sum+=TaxNum(TaxableIncome, Taxis[Range].LRange, Taxis[Range].Bracket);
+
+			for(int i=Range; i<Taxis.Length; i++){
+
+				Console.WriteLine("At "+Taxis[i].Bracket+"% bracket, the amount due is  "+0);
 			}
 
-			Console.WriteLine(Range + ":\t" + Taxis[Range].Bracket*(
-			TaxableIncome - Taxis[Range].LRange ) + "\t" + Taxis[Range].LRange + "\t" + TaxableIncome +"\t" + Taxis[Range].Bracket);
-			Sum+=(Taxis[Range].Bracket*(TaxableIncome - Taxis[Range].LRange ));
-			Console.WriteLine(Sum+"\n\n");
+
+			if ( sum<0)
+				sum=0;
+
+			Console.WriteLine("Your tax is " + sum +
+					"$ with a gross income percentage of " + Math.Round(sum/temp,2)  
+					+ "% adjected it's " + Math.Round(sum/TaxableIncome,2) + "%\n" +
+
+					"At a dectuable rate of " + Det + "\n");
+
+
+
 		}
+
+
 
 		//User inputs income, and keeps adding to their income till entering 0
 		//They will asked to either accept standard decuation, or manual detuection.
 		//Get federal tax of the person at each bracket, and return total, as well as gross income/adjected growth income.
 		static void Main(string[] args)
 		{
-			FederalTax(8000);
-			FederalTax(16000);
-			FederalTax(32000);
-			FederalTax(64000);
-			FederalTax(128000);
+			var temp = 33.0f;
+			var weather = (temp >32)? "Rain" : "Snow";
+			Console.WriteLine(weather);
+
+
+
 		}
 	}
 }
